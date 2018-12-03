@@ -1,0 +1,42 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+## Global config file
+CONF="${DIR}/.config"
+
+# check if config file exist
+if [ -e  $CONF ]
+then
+    source $CONF
+else
+    echo Config not found: ${CONF}
+    #exit
+fi
+
+# downbload
+FILE=magento-${VER}.tar.bz2
+if [ -f $FILE ]; then
+    echo "File $FILE exists"
+else
+    wget -c https://github.com/ukraine-magento/setup/raw/master/magento1/$FILE
+fi
+
+if [ ! -f $FILE ]; then
+    echo "File $FILE not found!"
+    exit
+fi
+cd ${WEB_ROOT}
+tar xvjf ~/$FILE
+if [ -d $ROOT ]
+then
+    echo ERR: ${ROOT} already exist in ${WEB_ROOT}
+    exit 1
+else
+    mv magento ${ROOT}
+fi
+cd ${MAGENTO}
+mkdir var/cache/
+chmod -R o+w media var
+chmod o+w app/etc
+chmod +x ./mage
